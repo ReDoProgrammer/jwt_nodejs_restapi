@@ -1,0 +1,29 @@
+GET HTTP://localhost:3000/posts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJlRG8iLCJpYXQiOjE2MDU2MjI0ODUsImV4cCI6MTYwNTYyMjUwNX0.ARkJZCKhCctV7FupOptlqAJY7HzR2_9GLxqOCNFrAjw
+
+###
+
+POST http://localhost:3000/token
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJlRG8iLCJpYXQiOjE2MDU2MjI2MTR9.BM_j4iZeagP1fCXeALYPtgTlHEHjFV6z2H_uiY2m8yM"
+}
+
+
+###
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "username":"ReDo",
+    "password":"123"
+}
+
+###
+DELETE http://localhost:3000/logout
+Content-Type: application/json
+
+{
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJlRG8iLCJpYXQiOjE2MDU2MjI2MTR9.BM_j4iZeagP1fCXeALYPtgTlHEHjFV6z2H_uiY2m8yM"
+}

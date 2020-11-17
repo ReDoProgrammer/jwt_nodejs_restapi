@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RESTAPI Nodejs JWT</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="container">
+        <div class="row mb-2">
+            <div class="col-sm-12 text-right">
+                <button class="btn btn-danger" id="btnLogout">Logout</button>
+            </div>
+        </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+          </tr>
+        </thead>
+        <tbody id="data"></tbody>
+      </table>
+    </div>
+  </body>
+</html>
+
+<script>
+  $(document).ready(function () {
+    // alert('hello world')
+     loadData();    
+  });
+
+  $('#btnLogout').click(function(){
+      $.ajax({
+          url:'/logout',
+          type:'delete',
+          data:{
+              token:localStorage.getItem("refreshToken")
+          },
+          success:function(data,statusText,xhr){
+              if(xhr.status == 204){
+                localStorage.clear();
+                window.location.href = '/login';
+              }
+          }
+      })
+  })
+
+  function loadData() {
+    $.ajax({
+      url: "/posts",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data, statusText, xhr) {
+        if (xhr.status == 200) {
+          $("#data").empty();
+          let idx = 1;
+          $.each(data.posts, function (k, v) {
+            $("#data").append(
+              "<tr><td>" + idx++ + "</td><td>" + v.title + "</td></tr>"
+            );
+          });
+        }
+       
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        if(xhr.status == 403 || xhr.status == 401){
+            $.ajax({
+                url:'/token',
+                type:'post',
+                data:{
+                    token:localStorage.getItem("refreshToken")
+                },
+                success:function(data, statusText, xhr){
+                    if(xhr.status == 200){
+                        localStorage.setItem("accessToken", data.accessToken);
+                        loadData();
+                    }
+                }, error: function (xhr, textStatus, errorThrown) {
+                    window.location.href = '/login';
+                }
+            })
+           
+        }
+      },
+    });
+  }
+</script>

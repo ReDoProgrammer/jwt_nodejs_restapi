@@ -3,8 +3,27 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const jwt = require('jsonwebtoken');
+const bodyParser = require("body-parser"); //get data from post form
+
+
+app.set("view engine", "ejs"); //set view engine 
+app.set("views", "./views"); //set view folder
+app.use(express.static("./public")); //set static location
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 
 app.use(express.json());
+
+app.get('/login',(req,res)=>{
+    res.render('login');
+})
+app.get('/',(req,res)=>{
+    res.render('index');
+})
+
+
 
 const posts =[
     {
@@ -12,7 +31,7 @@ const posts =[
         title:'Post 1'
     },
     {
-        username:'ReDo',
+        username:'redo',
         title:'Post 1'
     },
     {
@@ -30,15 +49,13 @@ app.get('/posts',authenticateToken,(req,res)=>{
 let refershTokens = [];
 app.post('/token',(req,res)=>{
     const refreshToken = req.body.token;
-
     if(refreshToken == null) return res.sendStatus(401);
 
     if(!refershTokens.includes(refreshToken)) return res.sendStatus(403);
 
-    console.log('array:',refershTokens);
+
     jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,(err,user)=>{
         if(err) return res.sendStatus(403);
-        console.log(user);
         const accessToken = generateAccessToken({username:user.username});
 
         res.json({
@@ -68,7 +85,7 @@ app.post('/login',(req,res)=>{
 
 app.delete('/logout',(req,res)=>{
     refershTokens = refershTokens.filter(token => token!== req.body.token);
-    console.log('token:',req.body.token,'logout: ',refershTokens);
+    console.log('after logout:',refershTokens);
     res.sendStatus(204);
 })
 
@@ -88,7 +105,7 @@ function authenticateToken(req,res,next){
 }
 
 function generateAccessToken(user){
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'20s'});
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'10s'});
 }
 
 app.listen(3000,()=>{
